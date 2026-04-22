@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>axrivyx#2017</title>
+
+<style>
+:root{
+  --bg:#000;
+  --text:#eaeaea;
+  --accent:#6a00ff;
+}
+
+body{
+  margin:0;
+  font-family:monospace;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* ===== BACKGROUND ===== */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  filter:contrast(1.2) saturate(1.3);
+}
+
+/* glow blob */
+body::before{
+  content:"";
+  position:fixed;
+  width:600px;
+  height:600px;
+  background:radial-gradient(circle,#6a00ff 0%,transparent 60%);
+  filter:blur(160px);
+  opacity:0.18;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+
+/* ===== INTRO ===== */
+#intro{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+
+.hero-type{
+  font-size:60px;
+  font-weight:900;
+  background:linear-gradient(90deg,#fff,#aaa,#6a00ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero-type::after{
+  content:"|";
+  animation:blink .7s infinite;
+}
+
+@keyframes blink{50%{opacity:0;}}
+
+#loading{
+  margin-top:10px;
+  font-size:12px;
+  opacity:0;
+}
+
+/* ===== APP ===== */
+#app{
+  opacity:0;
+  transition:1s;
+}
+
+.wrapper{
+  max-width:800px;
+  margin:auto;
+  padding:90px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* ===== YOUR ORIGINAL CARD STYLE (UNCHANGED) ===== */
+.card{
+  padding:24px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(10,10,10,0.35);
+  backdrop-filter:blur(18px);
+  position:relative;
+  overflow:hidden;
+
+  transition:
+    transform 0.4s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+
+  animation:floatIdle 6s ease-in-out infinite;
+}
+
+/* sweep light */
+.card::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:120%;
+  height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.08),transparent);
+}
+
+.card:hover::after{
+  animation:sweep 1.2s ease;
+}
+
+@keyframes sweep{
+  100%{left:120%;}
+}
+
+/* hover */
+.card:hover{
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.5),
+    0 0 50px rgba(106,0,255,0.25);
+  border-color:rgba(106,0,255,0.5);
+}
+
+/* float */
+@keyframes floatIdle{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-4px);}
+}
+
+/* ===== HERO ===== */
+.hero{
+  max-width:340px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.hero-name{
+  font-size:72px;
+  font-weight:900;
+  background:linear-gradient(90deg,#fff,#aaa,#6a00ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* center cards */
+.card:not(.hero){
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  min-height:120px;
+}
+
+/* ===== CONTACT ===== */
+.contact-list{
+  margin-top:12px;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.contact-item{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 14px;
+  border-radius:14px;
+
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(0,0,0,0.25);
+
+  text-decoration:none;
+  color:var(--text);
+
+  overflow:hidden;
+  transition:0.35s;
+}
+
+.contact-item:hover{
+  transform:scale(1.02);
+  border-color:rgba(106,0,255,0.6);
+  box-shadow:0 0 25px rgba(106,0,255,0.2);
+}
+
+.left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.icon{
+  width:20px;
+  height:20px;
+  color:var(--text);
+}
+
+.slide{
+  position:absolute;
+  right:-100px;
+  top:0;
+  height:100%;
+  width:100px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--accent);
+  color:#fff;
+
+  transition:0.35s;
+}
+
+.contact-item:hover .slide{
+  right:0;
+}
+
+/* ===== NEW SMOOTH REVEAL (ONLY ANIMATION CHANGED) ===== */
+.card{
+  opacity:0;
+  transform:translateY(40px) scale(0.97);
+  transition:
+    opacity 0.9s cubic-bezier(.22,1,.36,1),
+    transform 0.9s cubic-bezier(.22,1,.36,1);
+}
+
+.card.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div id="intro">
+  <div class="hero-type" id="type"></div>
+  <div id="loading">loading...</div>
+</div>
+
+<div id="app">
+<div class="wrapper">
+
+  <div class="card hero">
+    <div class="hero-name">axrivyx</div>
+  </div>
+
+  <div class="card">
+    <h2>about me</h2>
+    <p>self-taught developer focused on building clean, minimal and high-impact interfaces. i don’t follow trends — i design my own style and detail-driven ui. always leveling up in html, css and javascript.</p>
+  </div>
+
+  <div class="card">
+    <h2>my skills</h2>
+    <p>html • css • javascript • ui design animations • sport • gaming</p>
+  </div>
+<!-- CONTACT -->
+<div class="card">
+  <h2>contact</h2>
+  <p>click to open</p>
+
+  <div class="contact-list">
+
+    <a href="https://t.me/s3rxchyz" target="_blank" class="contact-item">
+      <span>telegram</span>
+      <div class="slide">open</div>
+    </a>
+
+    <a href="https://www.tiktok.com/@jjjjjlll666" target="_blank" class="contact-item">
+      <span>tiktok</span>
+      <div class="slide">open</div>
+    </a>
+
+  </div>
+</div>
+</div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* TYPE */
+let text="axrivyx",i=0,el=document.getElementById("type");
+
+function type(){
+  if(i<text.length){
+    el.textContent+=text[i++];
+    setTimeout(type,120);
+  } else {
+    document.getElementById("loading").style.opacity=1;
+
+    setTimeout(()=>{
+      intro.style.display="none";
+      app.style.opacity=1;
+      document.body.style.overflow="auto";
+    },1000);
+  }
+}
+setTimeout(type,500);
+
+/* REVEAL */
+const cards=document.querySelectorAll(".card");
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add("show");
+    }
+  });
+},{threshold:0.15});
+
+cards.forEach(c=>obs.observe(c));
+
+/* BACKGROUND PARTICLES */
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+let particles=[];
+
+for(let i=0;i<70;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    vx:(Math.random()-0.5)*0.5,
+    vy:(Math.random()-0.5)*0.5,
+    r:Math.random()*2
+  });
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  particles.forEach(p=>{
+    p.x+=p.vx;
+    p.y+=p.vy;
+
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;
+    if(p.y<0||p.y>canvas.height)p.vy*=-1;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(106,0,255,0.35)";
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
